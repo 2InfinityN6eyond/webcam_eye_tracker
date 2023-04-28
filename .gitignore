@@ -1,0 +1,7 @@
+*chechpoints/
+*.pth
+*._*
+*.jpg
+*.json
+*.png
+*.zip
