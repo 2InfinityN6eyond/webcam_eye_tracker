@@ -25,7 +25,8 @@ class EyeTracker(multiprocessing.Process) :
             shm_queue_size  :int,
             shm_idx_queue   :multiprocessing.Queue,
             stop_flag       :multiprocessing.Event,
-            model_path      :str = "../../eye_tracker_model/checkpoints/model_20230428_105603_199"
+            #model_path      :str = "../../eye_tracker_model/checkpoints/model_20230428_105603_199"
+            model_path      :str = "/Volumes/HJP/PROJECTS/webcam_eye_tracker/eye_tracker_model/checkpoints/model_20230504_215350_198"
         ) :
         super(EyeTracker, self).__init__()
         self.screen_width   = screen_width
@@ -68,7 +69,5 @@ class EyeTracker(multiprocessing.Process) :
             mouse_position = (pred * self.screen_geomotry).astype(int)
             print(mouse_position)
             mouse_controller.position = mouse_position
-
-
 
         face_shm.close()

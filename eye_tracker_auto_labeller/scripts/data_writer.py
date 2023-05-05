@@ -93,7 +93,7 @@ class DataWriter(multiprocessing.Process) :
         save_data_queue : multiprocessing.Queue,
         stop_flag       : multiprocessing.Event,
         save_every_data_flag : bool = False,
-        save_image_flag : bool = False,
+        save_image_flag : bool = True,
     ) :
         super(DataWriter, self).__init__()
         self.frame_width    = frame_width
