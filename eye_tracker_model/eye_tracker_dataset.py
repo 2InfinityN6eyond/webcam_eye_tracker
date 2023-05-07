@@ -66,10 +66,10 @@ class EyeTrackerDataset(Dataset) :
         self.return_image = return_image
 
         self.label_path_list = sorted(glob(
-            f"{DATA_ROOT_PATH}/*/*.json"
+            f"{self.DATA_ROOT_PATH}/*/*.json"
         ))
         self.image_path_list = sorted(glob(
-            f"{DATA_ROOT_PATH}/*/*.png"
+            f"{self.DATA_ROOT_PATH}/*/*.png"
         ))
 
         # there might exists case where eiter image or label does not exist
