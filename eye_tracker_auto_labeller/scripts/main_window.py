@@ -191,6 +191,27 @@ class MainWindow(QtWidgets.QMainWindow):
         if face_landmark_array[:, :2].min() < 0 :
             return
 
+        OVAL_UPPER_HALF = [361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132]
+        OVAL_LOWER_HALF = [234, 127, 162, 21, 54, 103, 67, 109, 10, 338, 297, 332, 284, 251, 389, 356, 454]
+        OVAL_LEFT_HALF =  [338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377]
+        OVAL_RIGHT_HALF = [148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109]
+
+        ver_mean = np.mean(face_landmark_array[OVAL_LOWER_HALF], axis=0) - np.mean(face_landmark_array[OVAL_UPPER_HALF], axis=0)
+        hor_mean = np.mean(face_landmark_array[OVAL_RIGHT_HALF], axis=0) - np.mean(face_landmark_array[OVAL_LEFT_HALF],  axis=0)
+
+        hor_diff = face_landmark_array[93]  - face_landmark_array[323]
+        ver_diff = face_landmark_array[152] - face_landmark_array[10]
+
+        print(
+            "{0:.4f} {1:.4f} {2:.4f} {3:.4f}".format(
+                np.dot(ver_mean, hor_mean),
+                np.sum(hor_diff * hor_diff),
+                np.sum(ver_diff * ver_diff),
+                np.dot(hor_diff, ver_diff)
+            )
+        )
+
+
         self.three_dimention_visualizer.updateFace(face_landmark_array)
 
         vis_image = image.copy() 
@@ -259,8 +280,8 @@ class MainWindow(QtWidgets.QMainWindow):
             :
         ])
         self.left_eye_vis_plotter.update(vis_image[
-            right_eye_lt_rb[1]:right_eye_lt_rb[3],
-            right_eye_lt_rb[0]:right_eye_lt_rb[2],
+            left_eye_lt_rb[1]:left_eye_lt_rb[3],
+            left_eye_lt_rb[0]:left_eye_lt_rb[2],
             :
         ])
         self.right_eye_plotter.update(image[

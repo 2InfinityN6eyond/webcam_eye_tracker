@@ -259,8 +259,8 @@ class MainWindow(QtWidgets.QMainWindow):
             :
         ])
         self.left_eye_vis_plotter.update(vis_image[
-            right_eye_lt_rb[1]:right_eye_lt_rb[3],
-            right_eye_lt_rb[0]:right_eye_lt_rb[2],
+            left_eye_lt_rb[1]:left_eye_lt_rb[3],
+            left_eye_lt_rb[0]:left_eye_lt_rb[2],
             :
         ])
         self.right_eye_plotter.update(image[
