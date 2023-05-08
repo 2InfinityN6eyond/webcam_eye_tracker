@@ -41,8 +41,6 @@ class EyeTrackerData :
     left_iris_landmark_array    : torch.Tensor
     right_iris_landmark_arrya   : torch.Tensor
 
-
-
 class EyeTrackerDataset(Dataset) :
     def __init__(
         self,

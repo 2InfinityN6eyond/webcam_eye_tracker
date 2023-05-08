@@ -9,6 +9,14 @@ import pyqtgraph.opengl as gl
 
 mp_face_mesh = mp.solutions.face_mesh
 
+
+OVAL_UPPER_HALF = [361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132]
+OVAL_LOWER_HALF = [234, 127, 162, 21, 54, 103, 67, 109, 10, 338, 297, 332, 284, 251, 389, 356, 454]
+OVAL_LEFT_HALF =  [338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377]
+OVAL_RIGHT_HALF = [148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109]
+
+
+
 def edge_list_2_path(edge_list) :
     tesel = edge_list
     change_occured = True
@@ -101,6 +109,20 @@ class TwoDimensionVisualizer() :
         image,
         landmark_array
     ) :
+        
+        face_landmark_array = landmark_array.copy()
+        ver_mean_diff = np.mean(face_landmark_array[OVAL_LOWER_HALF], axis=0) - np.mean(face_landmark_array[OVAL_UPPER_HALF], axis=0)
+        hor_mean_diff = np.mean(face_landmark_array[OVAL_RIGHT_HALF], axis=0) - np.mean(face_landmark_array[OVAL_LEFT_HALF],  axis=0)
+        normal_vec = np.cross(hor_mean_diff, ver_mean_diff)
+        print(
+            "{0:.4f} {1:.4f} {2:.4f} {3}".format(
+                np.dot(ver_mean_diff, hor_mean_diff),
+                np.sqrt(np.sum(ver_mean_diff * ver_mean_diff)),
+                np.sqrt(np.sum(hor_mean_diff * hor_mean_diff)),
+                normal_vec
+            )
+        )
+
         landmark_2d_array = landmark_array[:, :2].copy()
         landmark_2d_array *= np.array([
             image.shape[1], image.shape[0]
@@ -108,7 +130,6 @@ class TwoDimensionVisualizer() :
         landmark_2d_array = landmark_2d_array.astype(int)
         
         list(map(
-            #lambda idx_list : print(landmark_2d_array[idx_list]),
             lambda idx_list : cv2.polylines(
                 image,
                 [landmark_2d_array[idx_list]],
@@ -123,7 +144,6 @@ class TwoDimensionVisualizer() :
             FACE_RIGHT_IRIS_PATH_LIST
         ))
         list(map(
-            #lambda idx_list : print(landmark_2d_array[idx_list]),
             lambda idx_list : cv2.polylines(
                 image,
                 [landmark_2d_array[idx_list]],
@@ -163,7 +183,7 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
         landmark_array,
         set_mean_as_origin = True,
         always_place_center = False,
-    ) :
+    ) : 
         landmark_array = landmark_array.copy()
         for line_item in self.face_line_list :
             self.removeItem(line_item)
@@ -187,6 +207,26 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
             FACE_RIGHT_EYE_PATH_LIST +
             FACE_RIGHT_IRIS_PATH_LIST
         ))
+
+        ver_mean_diff = np.mean(landmark_array[OVAL_LOWER_HALF], axis=0) - np.mean(landmark_array[OVAL_UPPER_HALF], axis=0)
+        hor_mean_diff = np.mean(landmark_array[OVAL_RIGHT_HALF], axis=0) - np.mean(landmark_array[OVAL_LEFT_HALF],  axis=0)
+        normal_vec = np.cross(hor_mean_diff, ver_mean_diff)
+        normal_line_item = gl.GLLinePlotItem(
+            pos = np.array([ [0, 0, 0], normal_vec ]) + landmark_array[FACE_OVAL_PATH_LIST[0]].mean(axis=0),
+            color = pg.mkColor((255, 255, 255)), width = 10,
+            antialias = True
+        )
+        self.face_line_list.append(normal_line_item)
+
+        eye_normal_line_item = gl.GLLinePlotItem(
+            pos = np.array([
+                [0, 0, 0], normal_vec 
+            ]) + landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0),
+            color = pg.mkColor((255, 255, 255)), width = 10,
+            antialias = True
+        )
+        self.face_line_list.append(eye_normal_line_item)
+
         for item in self.face_line_list :
             if item :
                 self.addItem(item)
