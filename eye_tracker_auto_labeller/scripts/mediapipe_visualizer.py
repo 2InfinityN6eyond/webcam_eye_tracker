@@ -114,14 +114,14 @@ class TwoDimensionVisualizer() :
         ver_mean_diff = np.mean(face_landmark_array[OVAL_LOWER_HALF], axis=0) - np.mean(face_landmark_array[OVAL_UPPER_HALF], axis=0)
         hor_mean_diff = np.mean(face_landmark_array[OVAL_RIGHT_HALF], axis=0) - np.mean(face_landmark_array[OVAL_LEFT_HALF],  axis=0)
         normal_vec = np.cross(hor_mean_diff, ver_mean_diff)
-        print(
+        '''print(
             "{0:.4f} {1:.4f} {2:.4f} {3}".format(
                 np.dot(ver_mean_diff, hor_mean_diff),
                 np.sqrt(np.sum(ver_mean_diff * ver_mean_diff)),
                 np.sqrt(np.sum(hor_mean_diff * hor_mean_diff)),
                 normal_vec
             )
-        )
+        )'''
 
         landmark_2d_array = landmark_array[:, :2].copy()
         landmark_2d_array *= np.array([
@@ -230,3 +230,13 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
         for item in self.face_line_list :
             if item :
                 self.addItem(item)
+
+        pitch   = np.rad2deg(np.arctan2(normal_vec[2], normal_vec[1]))
+        yaw     = np.rad2deg(np.arctan2(normal_vec[2], normal_vec[0]))
+        #roll    = np.rad2deg()
+        
+        print(
+            "{0:.4f} {1:.4f}  {2}".format(
+                 yaw + 90, pitch + 90, normal_vec
+            )
+        )
