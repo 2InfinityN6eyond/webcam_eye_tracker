@@ -228,11 +228,21 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
             if item :
                 self.addItem(item)
 
+<<<<<<< HEAD
         print(
             "{0:.4f} {1:.4f} {2:.4f} {3}".format(
                 np.dot(ver_mean_diff, hor_mean_diff),
                 np.sqrt(np.sum(normal_vec * normal_vec)),
                 np.sqrt(np.sum(hor_mean_diff * hor_mean_diff)),
                 normal_vec
+=======
+        pitch   = np.rad2deg(np.arctan2(normal_vec[2], normal_vec[1]))
+        yaw     = np.rad2deg(np.arctan2(normal_vec[2], normal_vec[0]))
+        #roll    = np.rad2deg()
+        
+        print(
+            "{0:.4f} {1:.4f}  {2}".format(
+                 yaw + 90, pitch + 90, normal_vec
+>>>>>>> f8ca483062005b57caf21e5bf8ed5274eb3a9b8c
             )
         )
