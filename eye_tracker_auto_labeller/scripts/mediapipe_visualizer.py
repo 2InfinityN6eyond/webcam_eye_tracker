@@ -224,16 +224,28 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
         )
         self.face_line_list.append(eye_normal_line_item)
 
+        pitch   = np.arctan2(normal_vec[1], -normal_vec[2])
+        yaw     = np.arctan2(normal_vec[0], -normal_vec[2])
+        #roll    = np.rad2deg()
+
+        test_vector = np.array([np.tan(yaw), np.tan(pitch), -1])
+
+        self.face_line_list.append(
+            gl.GLLinePlotItem(
+                pos = np.array([
+                    [0, 0, 0], test_vector 
+                ]) + landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0),
+                color = pg.mkColor((100, 255, 255)), width = 1,
+                antialias = True
+            )
+        )
+
         for item in self.face_line_list :
             if item :
                 self.addItem(item)
 
-        pitch   = np.rad2deg(np.arctan2(normal_vec[2], normal_vec[1]))
-        yaw     = np.rad2deg(np.arctan2(normal_vec[2], normal_vec[0]))
-        #roll    = np.rad2deg()
-        
         print(
-            "{0:.4f} {1:.4f}  {2}".format(
-                 yaw + 90, pitch + 90, normal_vec
+            "{0:.4f} {1:.4f} {2} {3}".format(
+                np.rad2deg(yaw), np.rad2deg(pitch), landmark_array[FACE_LEFT_IRIS_PATH_LIST].mean(axis=0), landmark_array[FACE_RIGHT_EYE_PATH_LIST].mean(axis=0) # normal_vec
             )
         )
