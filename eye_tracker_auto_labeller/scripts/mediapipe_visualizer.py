@@ -226,7 +226,24 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
         )
         self.face_line_list.append(eye_normal_line_item)
 
-<<<<<<< HEAD
+        yaw     = np.arctan2(normal_vec[0], -normal_vec[2])
+        pitch   = np.arctan2(normal_vec[1], -normal_vec[2])
+        
+        roll_vec = np.array([
+            np.sin(pitch) * np.sin(yaw),
+            np.cos(pitch),
+            np.sin(pitch) * np.cos(yaw)
+        ])
+        
+
+        self.face_line_list.append(gl.GLLinePlotItem(
+            pos = np.array([
+                [0, 0, 0], [0, 1, 0]
+            ]) + landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0),
+            color = pg.mkColor((255, 255, 255)), width = 2,
+            antialias = True
+        ))
+
         pitch   = np.arctan2(normal_vec[1], -normal_vec[2])
         yaw     = np.arctan2(normal_vec[0], -normal_vec[2])
         pitch_yaw_normal_vector = np.array([np.sin(pitch) * np.sin(yaw), -np.cos(pitch), -np.sin(pitch) * np.cos(yaw)])
@@ -284,32 +301,20 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
                 antialias = True
             )
         )
-=======
-        yaw     = np.arctan2(normal_vec[0], -normal_vec[2])
-        pitch   = np.arctan2(normal_vec[1], -normal_vec[2])
-        
-        roll_vec = np.array([
-            np.sin(pitch) * np.sin(yaw),
-            np.cos(pitch),
-            np.sin(pitch) * np.cos(yaw)
-        ])
-        
-
-        self.face_line_list.append(gl.GLLinePlotItem(
-            pos = np.array([
-                [0, 0, 0], [0, 1, 0]
-            ]) + landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0),
-            color = pg.mkColor((255, 255, 255)), width = 2,
-            antialias = True
-        ))
->>>>>>> 90c0e3d (laptop temp)
 
         for item in self.face_line_list :
             if item :
                 self.addItem(item)
 
         print(
-<<<<<<< HEAD
+            "{0:.4f} {1:.4f}  {2}".format(
+                np.sqrt(np.sum(
+                    ver_mean_diff * ver_mean_diff
+                )) /  np.sqrt(np.sum(
+                    hor_mean_diff * hor_mean_diff
+                )),
+                np.rad2deg(pitch),
+                roll_vec
             "{0:.4f} {1:.4f} {2} {3}".format(
                 np.rad2deg(roll),
                 np.rad2deg(yaw),
@@ -321,15 +326,4 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
                 #landmark_array[FACE_LEFT_IRIS_PATH_LIST].mean(axis=0),
                 #landmark_array[FACE_RIGHT_EYE_PATH_LIST].mean(axis=0)
                 # normal_vec
-=======
-            "{0:.4f} {1:.4f}  {2}".format(
-                np.sqrt(np.sum(
-                    ver_mean_diff * ver_mean_diff
-                )) /  np.sqrt(np.sum(
-                    hor_mean_diff * hor_mean_diff
-                )),
-                np.rad2deg(pitch),
-                roll_vec
->>>>>>> 90c0e3d (laptop temp)
             )
-        )
