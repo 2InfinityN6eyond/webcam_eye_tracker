@@ -170,6 +170,25 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
 
         self.setCameraParams(elevation = -90, azimuth = -90)
 
+        # x vector
+        self.addItem(gl.GLLinePlotItem(
+            pos = np.array([[0, 0, 0], [1, 0, 0]]),
+            color = pg.mkColor((255, 0, 0)), width = 2,
+            antialias = True
+        ))
+        # y vector
+        self.addItem(gl.GLLinePlotItem(
+            pos = np.array([[0, 0, 0], [0, 1, 0]]),
+            color = pg.mkColor((0, 255, 0)), width = 2,
+            antialias = True
+        ))
+        # z vector
+        self.addItem(gl.GLLinePlotItem(
+            pos = np.array([[0, 0, 0], [0, 0, 1]]),
+            color = pg.mkColor((0, 0, 255)), width = 2,
+            antialias = True
+        ))
+
         self.left_hand_line_list = []
         self.right_hand_line_list = []
         self.face_line_list = []
@@ -205,100 +224,49 @@ class ThreeDimensionVisualizer(gl.GLViewWidget) :
             FACE_RIGHT_IRIS_PATH_LIST
         ))
 
-        ver_mean_diff = np.mean(landmark_array[OVAL_LOWER_HALF], axis=0) - np.mean(landmark_array[OVAL_UPPER_HALF], axis=0)
-        ver_mean_diff_normalized = ver_mean_diff / np.sqrt(np.sum(ver_mean_diff * ver_mean_diff))
-        hor_mean_diff = np.mean(landmark_array[OVAL_RIGHT_HALF], axis=0) - np.mean(landmark_array[OVAL_LEFT_HALF],  axis=0)
+        face_dir_x = np.mean(landmark_array[OVAL_RIGHT_HALF], axis=0) - np.mean(landmark_array[OVAL_LEFT_HALF],  axis=0)
+        face_dir_y = np.mean(landmark_array[OVAL_LOWER_HALF], axis=0) - np.mean(landmark_array[OVAL_UPPER_HALF], axis=0)
+        face_dir_z = np.cross(face_dir_x, face_dir_y)
+        face_area_factor = np.sqrt(np.sqrt(np.sum(np.square(face_dir_z))))
+
+        face_dir_x_norm = face_dir_x / np.sqrt(np.sum(face_dir_x * face_dir_x))
+        face_dir_y_norm = face_dir_y / np.sqrt(np.sum(face_dir_y * face_dir_y))
+        face_dir_z_norm = face_dir_z / np.sqrt(np.sum(face_dir_z * face_dir_z))
+        eye_center_pos = landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0)
+
+        pitch = np.arctan2(-face_dir_z_norm[1], -face_dir_z_norm[2])
+        yaw   = np.arcsin(face_dir_z_norm[0])
+        roll  = np.arctan2(-face_dir_y_norm[0], face_dir_x_norm[0])
         
-        normal_vec = np.cross(hor_mean_diff, ver_mean_diff)
-        normal_line_item = gl.GLLinePlotItem(
-            pos = np.array([ [0, 0, 0], normal_vec ]) + landmark_array[FACE_OVAL_PATH_LIST[0]].mean(axis=0),
-            color = pg.mkColor((255, 255, 255)), width = 10,
+        # face x
+        self.face_line_list.append(gl.GLLinePlotItem(
+                pos = np.array([[0, 0, 0], face_dir_x]) + eye_center_pos,
+                color = pg.mkColor((255, 50, 50)), width = 2,
+                antialias = True
+        ))
+        # face y
+        self.face_line_list.append(gl.GLLinePlotItem(
+                pos = np.array([[0, 0, 0], face_dir_y]) + eye_center_pos,
+                color = pg.mkColor((50, 255, 50)), width = 2,
+                antialias = True
+        ))
+        # face z
+        self.face_line_list.append(gl.GLLinePlotItem(
+            pos = np.array([ [0, 0, 0], face_dir_z]) + eye_center_pos,
+            color = pg.mkColor((50, 50, 255)), width = 10,
             antialias = True
-        )
-        self.face_line_list.append(normal_line_item)
-
-        eye_normal_line_item = gl.GLLinePlotItem(
-            pos = np.array([
-                [0, 0, 0], normal_vec 
-            ]) + landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0),
-            color = pg.mkColor((255, 255, 255)), width = 10,
-            antialias = True
-        )
-        self.face_line_list.append(eye_normal_line_item)
-
-        pitch   = np.arctan2(normal_vec[1], -normal_vec[2])
-        yaw     = np.arctan2(normal_vec[0], -normal_vec[2])
-        pitch_yaw_normal_vector = np.array([np.sin(pitch) * np.sin(yaw), -np.cos(pitch), -np.sin(pitch) * np.cos(yaw)])
-        roll    = np.arccos(np.dot(ver_mean_diff_normalized, pitch_yaw_normal_vector))
-
-        self.face_line_list.append(
-            gl.GLLinePlotItem(
-                pos = np.array([
-                    [0, 0, 0], pitch_yaw_normal_vector
-                ])+ landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0),
-                color = pg.mkColor((255, 255, 100)), width = 2,
-                antialias = True
-            )
-        )
-
-        self.face_line_list.append(
-            gl.GLLinePlotItem(
-                pos = np.array([
-                    [0, 0, 0], ver_mean_diff_normalized
-                ])+ landmark_array[FACE_LEFT_EYE_PATH_LIST[0] + FACE_RIGHT_EYE_PATH_LIST[0]].mean(axis=0),
-                color = pg.mkColor((100, 255, 255)), width = 2,
-                antialias = True
-            )
-        )
-
-        # x vector
-        self.face_line_list.append(
-            gl.GLLinePlotItem(
-                pos = np.array([
-                    [0, 0, 0], [1, 0, 0]
-                ]),
-                color = pg.mkColor((255, 0, 0)), width = 2,
-                antialias = True
-            )
-        )
-
-        # y vector
-        self.face_line_list.append(
-            gl.GLLinePlotItem(
-                pos = np.array([
-                    [0, 0, 0], [0, 1, 0]
-                ]),
-                color = pg.mkColor((0, 255, 0)), width = 2,
-                antialias = True
-            )
-        )
-
-        # z vector
-        self.face_line_list.append(
-            gl.GLLinePlotItem(
-                pos = np.array([
-                    [0, 0, 0], [0, 0, 1]
-                ]),
-                color = pg.mkColor((0, 0, 255)), width = 2,
-                antialias = True
-            )
-        )
+        ))
 
         for item in self.face_line_list :
             if item :
                 self.addItem(item)
 
         print(
-            "{0:.4f} {1:.4f} {2} {3}".format(
+            "r:{0:.4f} p:{1:.4f} y:{2:.4f}  r:{3:.4f} p:{4:.4f} y:{5:.4f} {6:.4f}".format(
+                roll, pitch, yaw,
                 np.rad2deg(roll),
-                np.rad2deg(yaw),
                 np.rad2deg(pitch),
-                #np.sqrt(np.sum(pitch_yaw_normal_vector * pitch_yaw_normal_vector)),
-                #np.sqrt(np.sum(ver_mean_diff_normalized * ver_mean_diff_normalized)),
-                ver_mean_diff,
-                pitch_yaw_normal_vector,
-                #landmark_array[FACE_LEFT_IRIS_PATH_LIST].mean(axis=0),
-                #landmark_array[FACE_RIGHT_EYE_PATH_LIST].mean(axis=0)
-                # normal_vec
+                np.rad2deg(yaw),
+                face_area_factor
             )
         )
